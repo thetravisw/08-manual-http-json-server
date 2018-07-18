@@ -8,6 +8,50 @@ Use the file `recentquotes.json` to show random popular book quotes on a webpage
 Your program should use `GSON` to parse the .json file. The page needs no
 functionality other than showing the quote, and the author. The page should
 choose one quote each time the page refreshes.
+
+## Input / Output
+Here's code snippets to help you receive connections and send responses:
+
+```java
+import java.io.*;
+import java.net.*;
+```
+
+```java
+ServerSocket welcomeSocket = new ServerSocket(PORT);
+
+boolean isRunning = true;
+while (isRunning) {
+  Socket connectionSocket = welcomeSocket.accept();
+  BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+  BufferedWriter outToClient = new BufferedWriter(new OutputStreamWriter(connectionSocket.getOutputStream()));
+
+  String requestLine = inFromClient.readLine();
+}
+```
+
+You must follow the HTTP specification. The specification for a response
+requires writing a first line with the version, and status code. One header
+must include `Content-Length` and have the value of the number of characters in
+the HTTP response body.
+
+```java
+// write the body
+StringBuffer httpBody = new StringBuffer();
+httpBody.write("<h1>random quotes</h1>\n");
+httpBody.write("<p>refresh page to see another random quote!</p>\n");
+
+// create content
+String quote = getRandomQuote();
+httpBody.write("<p>");
+httpBody.write(qoute);
+httpBody.write("</p>");
+
+outToClient.write("HTTP/1.1 200 OK\n");
+outToClient.write("Content-Length: " + httpBody.length() + "\n");
+outToClient.write("\n");
+outToClient.write(httpBody + "\n");
+```
   
 ## Testing  
 * Use JUnit to write a test to make sure quotes are chosen appropriately
