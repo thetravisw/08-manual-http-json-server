@@ -1,9 +1,78 @@
-# ![CF](http://i.imgur.com/7v5ASc8.png) Popular Book Quotes
+# ![CF](http://i.imgur.com/7v5ASc8.png) Manual HTTP JSON Server
 
 ## Resources  
 * [GSON User Guide](https://github.com/google/gson/blob/master/UserGuide.md)
 
-## Feature Tasks
+## Part 1: Building a Manual HTTP HTML File Server
+Build a manual HTTP server that processes HTTP requests and sends back HTML
+files according to the request. The server should look at the path to determine
+which file it should load. The server should return with `404` not found errors
+if someone requests a page that doesn't exist.
+
+Configure a String property on your server to define the `static` root. The
+root of your server should be a file that contains HTML files. Make several
+small raw HTML files (without server-hosted images, CSS or JavaScript) that
+can be served by your server. Use Java to read the file contents and write
+the contents back as part of an HTTP response.
+
+Create classes like `HTTPRequest`, `HTTPResponse` and `HTTPStaticFileReader`
+to build useful objects that will help you build out the entire server.
+
+* The `HTTPRequest` class should be responsible for parsing and defining the
+  structure of a proper `HTTPRequest`
+* The `HTTPResponse` class should be responsible for generating proper HTTP
+  responses
+* The `HTTPStaticFileReader` class should have access to a `HTTPRequest` object
+  and use it to find the path of the requested file, read the file contents,
+  then format a `HTTPResponse with the file contents`
+
+## Part 2: Inserting JSON Data in Templates
+Create a special template syntax to allow you to insert JSON data in the middle
+of parsing an HTML file.
+
+Parse the file by reading it one line at a time. Check each line to see if it
+has the special template syntax `{{` and `}}`. Parse out the text between the
+curly-braces and look specifically for `RANDOM_JSON_QUOTE`. If
+`RANDOM_JSON_QUOTE` is there then replace the entire `{{RANDOM_JSON_QUOTE}}`
+portion of the file with an actual random JSON quote when you send out the 
+contents of the file in the HTTP Response.
+
+```html
+<html>
+  <head>
+    <title>My Website</title>
+  </head>
+  <body>
+    <h1>Random Book Quote</h1>
+    <p>{{RANDOM_JSON_QUOTE}}</p>
+  </body>
+</html>
+```
+
+For example, here's pseudo-code for accomplishing this:
+
+```
+read the HTTP request
+find the file associated with the request
+if the file doesn't exist
+  return a 404
+
+read each line of the file
+  detect if the line has special symbols {{ }}
+  if the symbol doesn't appear
+    append the line to the HTTP response
+
+  if the line has those symbols the following:
+    send the portion of the line before {{
+
+    extract the text between the symbols      
+    execute a function related to the symbol
+    send the result of the function related to the symbol
+
+    send the portion of the line before }}
+send the entire HTTP response
+```
+
 Use the file `recentquotes.json` to show random popular book quotes on a webpage.
 Your program should use `GSON` to parse the .json file. The page needs no
 functionality other than showing the quote, and the author. The page should
