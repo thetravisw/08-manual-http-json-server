@@ -121,6 +121,24 @@ outToClient.write("Content-Length: " + httpBody.length() + "\n");
 outToClient.write("\n");
 outToClient.write(httpBody + "\n");
 ```
+
+Reading JSON data: first, be sure to create a class that models
+your JSON data. Then you can use `Gson` to parse the JSON into a
+Java object, as defined by your POJO (Plain Old Java Object, class).
+
+```java
+Gson gson = new Gson();
+String filepath = "/Users/moonmayor/Desktop/JsonApp/src/recentquotes.json";
+File file = new File(filepath);
+FileReader reader = new FileReader(file);
+
+Quote[] quotes = gson.fromJson(reader, Quote[].class);
+System.out.println("Num quotes: " + quotes.length);
+
+int randomIndex = (int) Math.floor(quotes.length * Math.random());
+Quote quote = quotes[randomIndex];
+System.out.println(quote);
+```
   
 ## Testing  
 * Use JUnit to write a test to make sure quotes are chosen appropriately
