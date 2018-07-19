@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.*;
 
 class MyHttpServer {
-    public static final int PORT = 6789;
+    public static final int PORT = 7890;
 
     public static void main(String argv[]) throws Exception {
         ServerSocket welcomeSocket = new ServerSocket(PORT);
@@ -15,28 +15,13 @@ class MyHttpServer {
             BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
             BufferedWriter outToClient = new BufferedWriter(new OutputStreamWriter(connectionSocket.getOutputStream()));
 
-            // peel off the first GET/POST PATH line
-            String requestLine = inFromClient.readLine();
-            System.out.println("REQUEST: " + requestLine);
+            HTTP_Request request = new HTTP_Request(inFromClient);
+            HTTP_Static_File_Reader file = new HTTP_Static_File_Reader(request);
 
-            // get the next line to collect all the headers
-            String header = inFromClient.readLine();
-            // read lines and assume they're headers until reaching an empty line.
-            while (!header.equals("")) {
-                System.out.println("HEADER: " + header);
-                header = inFromClient.readLine();
-            }
-
-            String message = "<h1>neato</h1>";
-            outToClient.write("HTTP/1.1 200 OK\n");
-            outToClient.write("Content-Length: " + message.length() + "\n");
-            outToClient.write("\n");
-            outToClient.write(message + "\n");
-
-            outToClient.flush();
-            outToClient.close();
-
-            System.out.println("closed request.");
+            int statusCode = 200;
+            String body = file.getContents();
+            HTTPResponse response = new HTTPResponse (statusCode, body);
+            response.send(outToClient);
         }
     }
 }
